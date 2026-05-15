@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,part=foot": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 270
+    },
+    "facing=east,part=head": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 90
+    },
+    "facing=north,part=foot": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 180
+    },
+    "facing=north,part=head": {
+      "model": "playercollars:block/light_gray_dog_bed"
+    },
+    "facing=south,part=foot": {
+      "model": "playercollars:block/light_gray_dog_bed"
+    },
+    "facing=south,part=head": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 180
+    },
+    "facing=west,part=foot": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 90
+    },
+    "facing=west,part=head": {
+      "model": "playercollars:block/light_gray_dog_bed",
+      "y": 270
+    }
+  }
+}

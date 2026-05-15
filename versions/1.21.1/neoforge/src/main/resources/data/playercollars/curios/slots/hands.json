@@ -1,0 +1,6 @@
+{
+	"size": 1,
+	"operation": "SET",
+	"add_cosmetic": true,
+	"icon": "curios:slot/empty_hands_slot"
+}

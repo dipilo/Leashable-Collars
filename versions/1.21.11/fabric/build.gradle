@@ -1,0 +1,87 @@
+plugins {
+    id 'fabric-loom' version "${loom_version}"
+    id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+def artifactBaseName = "${project.mod_id}-${project.minecraft_version}-fabric"
+def artifactVersion = project.mod_version.endsWith("+${project.minecraft_version}")
+        ? project.mod_version.substring(0, project.mod_version.length() - project.minecraft_version.length() - 1)
+        : project.mod_version
+
+base {
+    archivesName = artifactBaseName
+}
+
+tasks.matching { it.name in ['jar', 'remapJar', 'sourcesJar', 'remapSourcesJar'] }.configureEach {
+    archiveVersion = artifactVersion
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter {
+            includeGroup 'maven.modrinth'
+        }
+    }
+    maven {
+        name = 'RedlanceMinecraft'
+        url = 'https://repo.redlance.org/public'
+    }
+    maven { url 'https://maven.wispforest.io/releases' }
+    maven { url 'https://maven.fabricmc.net' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "com.zigythebird.playeranim:PlayerAnimationLibFabric:${project.player_animation_lib_version}"
+}
+
+processResources {
+    inputs.properties([
+            version: project.version,
+            mod_id: project.mod_id,
+            mod_name: project.mod_name,
+            mod_description: project.mod_description,
+            mod_author: project.mod_author,
+            loader_version: project.loader_version
+    ])
+
+    filesMatching('fabric.mod.json') {
+        expand(version: project.version,
+                mod_id: project.mod_id,
+                mod_name: project.mod_name,
+                mod_description: project.mod_description,
+                mod_author: project.mod_author,
+                loader_version: project.loader_version)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+publishing {
+    publications {
+        create('mavenJava', MavenPublication) {
+            artifactId = artifactBaseName
+            from components.java
+        }
+    }
+}

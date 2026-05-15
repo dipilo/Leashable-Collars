@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.playercollars.clicker"
+  },
+  "effects": {},
+  "max_cost": {
+    "base": 35,
+    "per_level_above_first": 12
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 10,
+    "per_level_above_first": 12
+  },
+  "primary_items": "#playercollars:enchantable/clicker",
+  "slots": [
+    "mainhand"
+  ],
+  "supported_items": "#playercollars:enchantable/clicker",
+  "weight": 10
+}

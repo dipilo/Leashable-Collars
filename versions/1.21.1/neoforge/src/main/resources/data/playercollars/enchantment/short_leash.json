@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 2,
+  "description": {
+    "translate": "enchantment.playercollars.short_leash"
+  },
+  "effects": {},
+  "max_cost": {
+    "base": 30,
+    "per_level_above_first": 10
+  },
+  "max_level": 2,
+  "min_cost": {
+    "base": 8,
+    "per_level_above_first": 10
+  },
+  "primary_items": "#playercollars:enchantable/collar",
+  "slots": [
+    "any"
+  ],
+  "supported_items": "#playercollars:enchantable/collar",
+  "weight": 10
+}

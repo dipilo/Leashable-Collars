@@ -1,0 +1,108 @@
+plugins {
+    id 'net.neoforged.moddev' version "${moddevgradle_version}"
+    id 'maven-publish'
+}
+
+group = project.mod_group_id
+version = project.mod_version
+
+def artifactBaseName = "${project.mod_id}-${project.minecraft_version}-neoforge"
+def artifactVersion = project.mod_version.endsWith("+${project.minecraft_version}")
+        ? project.mod_version.substring(0, project.mod_version.length() - project.minecraft_version.length() - 1)
+        : project.mod_version
+
+base {
+    archivesName = artifactBaseName
+}
+
+tasks.matching { it.name in ['jar', 'sourcesJar'] }.configureEach {
+    archiveVersion = artifactVersion
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.theillusivec4.top/' }
+    maven { url 'https://maven.wispforest.io/releases' }
+    maven { url 'https://maven.su5ed.dev/releases' }
+    maven {
+        name = 'RedlanceMinecraft'
+        url = 'https://repo.redlance.org/public'
+    }
+    maven {
+        name = 'Mojang Libraries'
+        url = 'https://libraries.minecraft.net'
+    }
+}
+
+dependencies {
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${project.curios_version}"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${project.curios_version}:api"
+    implementation "com.zigythebird.playeranim:PlayerAnimationLibNeo:${project.player_animation_lib_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+neoForge {
+    enable {
+        version = project.neo_version
+        disableRecompilation = true
+    }
+    validateAccessTransformers = true
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.console.level', 'debug'
+        }
+
+        client {
+            client()
+        }
+
+        server {
+            server()
+        }
+
+        data {
+            data()
+        }
+    }
+
+    mods {
+        playercollars {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+processResources {
+    inputs.properties([
+            mod_id: project.mod_id,
+            mod_name: project.mod_name,
+            mod_license: project.mod_license,
+            mod_version: project.mod_version,
+            mod_authors: project.mod_authors,
+            mod_description: project.mod_description
+    ])
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand([
+                mod_id: project.mod_id,
+                mod_name: project.mod_name,
+                mod_license: project.mod_license,
+                mod_version: project.mod_version,
+                mod_authors: project.mod_authors,
+                mod_description: project.mod_description
+        ])
+    }
+}
+
+publishing {
+    publications {
+        create('mavenJava', MavenPublication) {
+            artifactId = artifactBaseName
+            from components.java
+        }
+    }
+}

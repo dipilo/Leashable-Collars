@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 4,
+  "description": {
+    "translate": "enchantment.playercollars.regeneration"
+  },
+  "effects": {},
+  "max_cost": {
+    "base": 40,
+    "per_level_above_first": 20
+  },
+  "max_level": 1,
+  "min_cost": {
+    "base": 20,
+    "per_level_above_first": 20
+  },
+  "primary_items": "#playercollars:enchantable/collar",
+  "slots": [
+    "any"
+  ],
+  "supported_items": "#playercollars:enchantable/collar",
+  "weight": 2
+}

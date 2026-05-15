@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_paws": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#playercollars:paws"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "playercollars:paw_configurator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_paws"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "playercollars:paw_configurator"
+    ]
+  }
+}

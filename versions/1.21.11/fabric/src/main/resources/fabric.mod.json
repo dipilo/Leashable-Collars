@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "license": "MIT",
+  "icon": "assets/playercollars/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.dipilodopilasaurus.leashablecollars.fabric.LeashableCollarsFabric"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "minecraft": "1.21.11",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}

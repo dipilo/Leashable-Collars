@@ -1,0 +1,168 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+
+plugins {
+    id 'net.neoforged.moddev' version "${moddevgradle_version}"
+    id 'maven-publish'
+}
+
+Object normalizeRecipeIngredient(Object value) {
+    if (value instanceof String) {
+        return value.startsWith('#') ? [tag: value.substring(1)] : [item: value]
+    }
+    if (value instanceof List) {
+        return value.collect { entry -> normalizeRecipeIngredient(entry) }
+    }
+    return value
+}
+
+Map normalizeRecipeJson(Map recipe) {
+    if (recipe.containsKey('key') && recipe.key instanceof Map) {
+        recipe.key = recipe.key.collectEntries { symbol, ingredient ->
+            [(symbol): normalizeRecipeIngredient(ingredient)]
+        }
+    }
+    if (recipe.containsKey('ingredients') && recipe.ingredients instanceof List) {
+        recipe.ingredients = recipe.ingredients.collect { ingredient ->
+            normalizeRecipeIngredient(ingredient)
+        }
+    }
+    if (recipe.containsKey('base')) {
+        recipe.base = normalizeRecipeIngredient(recipe.base)
+    }
+    return recipe
+}
+
+group = project.mod_group_id
+version = project.mod_version
+
+def artifactBaseName = "${project.mod_id}-${project.minecraft_version}-neoforge"
+def artifactVersion = project.mod_version.endsWith("+${project.minecraft_version}")
+        ? project.mod_version.substring(0, project.mod_version.length() - project.minecraft_version.length() - 1)
+        : project.mod_version
+
+base {
+    archivesName = artifactBaseName
+}
+
+tasks.matching { it.name in ['jar', 'sourcesJar'] }.configureEach {
+    archiveVersion = artifactVersion
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.theillusivec4.top/' }
+    maven { url 'https://maven.wispforest.io/releases' }
+    maven { url 'https://maven.su5ed.dev/releases' }
+    maven {
+        name = 'RedlanceMinecraft'
+        url = 'https://repo.redlance.org/public'
+    }
+    maven {
+        name = 'Mojang Libraries'
+        url = 'https://libraries.minecraft.net'
+    }
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        force 'com.google.code.gson:gson:2.10.1'
+        force 'org.slf4j:slf4j-api:2.0.9'
+        force 'it.unimi.dsi:fastutil:8.5.12'
+
+        eachDependency { details ->
+            if (details.requested.group == 'io.netty') {
+                details.useVersion '4.1.97.Final'
+                details.because 'Align PlayerAnimation transitive Netty with NeoForge 21.1 runtime constraints'
+            }
+        }
+    }
+}
+
+dependencies {
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:${project.curios_version}"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:${project.curios_version}:api"
+    implementation "com.zigythebird.playeranim:PlayerAnimationLibNeo:${project.player_animation_lib_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+neoForge {
+    enable {
+        version = project.neo_version
+        disableRecompilation = true
+    }
+    validateAccessTransformers = true
+
+    runs {
+        configureEach {
+            systemProperty 'forge.logging.console.level', 'debug'
+        }
+
+        client {
+            client()
+        }
+
+        server {
+            server()
+        }
+
+        data {
+            data()
+        }
+    }
+
+    mods {
+        playercollars {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+processResources {
+    inputs.properties([
+            mod_id: project.mod_id,
+            mod_name: project.mod_name,
+            mod_license: project.mod_license,
+            mod_version: project.mod_version,
+            mod_authors: project.mod_authors,
+            mod_description: project.mod_description
+    ])
+
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand([
+                mod_id: project.mod_id,
+                mod_name: project.mod_name,
+                mod_license: project.mod_license,
+                mod_version: project.mod_version,
+                mod_authors: project.mod_authors,
+                mod_description: project.mod_description
+        ])
+    }
+
+    doLast {
+        fileTree(destinationDir).matching {
+            include 'data/*/recipe/*.json'
+            include 'data/*/recipe/**/*.json'
+        }.files.each { recipeFile ->
+            def parsed = new JsonSlurper().parse(recipeFile)
+            if (!(parsed instanceof Map)) {
+                return
+            }
+
+            def normalized = normalizeRecipeJson(parsed as Map)
+            recipeFile.setText(JsonOutput.prettyPrint(JsonOutput.toJson(normalized)) + System.lineSeparator(), 'UTF-8')
+        }
+    }
+}
+
+publishing {
+    publications {
+        create('mavenJava', MavenPublication) {
+            artifactId = artifactBaseName
+            from components.java
+        }
+    }
+}

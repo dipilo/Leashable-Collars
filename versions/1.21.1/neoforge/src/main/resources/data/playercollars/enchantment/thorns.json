@@ -1,0 +1,22 @@
+{
+  "anvil_cost": 8,
+  "description": {
+    "translate": "enchantment.playercollars.thorns"
+  },
+  "effects": {},
+  "max_cost": {
+    "base": 40,
+    "per_level_above_first": 20
+  },
+  "max_level": 3,
+  "min_cost": {
+    "base": 12,
+    "per_level_above_first": 20
+  },
+  "primary_items": "#playercollars:enchantable/collar",
+  "slots": [
+    "any"
+  ],
+  "supported_items": "#playercollars:enchantable/collar",
+  "weight": 1
+}
